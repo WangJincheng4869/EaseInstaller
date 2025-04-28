@@ -1,6 +1,13 @@
-import './assets/main.css'
+import './styles/index.scss';
+import 'virtual:uno.css';
+import 'element-plus/dist/index.css';
+import 'element-plus/theme-chalk/dark/css-vars.css';
 
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import ElementPlus from 'element-plus';
 
-createApp(App).mount('#app')
+const app = createApp(App);
+
+app.use(ElementPlus);
+app.mount('#app');
