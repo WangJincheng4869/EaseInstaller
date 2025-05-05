@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Picture } from '@element-plus/icons-vue';
-import { ElIcon, ElImage, ElText } from 'element-plus';
+import { ElButton, ElIcon, ElImage, ElText } from 'element-plus';
 import WuKong from '../../../assets/wu-kong.png';
 
 // 文件列表项
@@ -22,9 +22,12 @@ defineOptions({
     </ElImage>
     <div class="grow pl-3">
       <ElText size="large" class="title" truncated>这是一个标题</ElText>
-      <ElText line-clamp="2" class="description"
-        >这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息</ElText
-      >
+      <ElText line-clamp="2" class="description">
+        这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息，这里可以自定义一些描述信息
+      </ElText>
+    </div>
+    <div class="flex items-center justify-center">
+      <ElButton type="primary" size="small" class="ml-3" plain round>安装</ElButton>
     </div>
   </div>
 </template>
