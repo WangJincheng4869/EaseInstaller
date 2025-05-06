@@ -1,8 +1,9 @@
-import { ElectronAPI } from '@electron-toolkit/preload';
+import { CommonToolkit } from '../ipc/common/types';
+
+export {};
 
 declare global {
   interface Window {
-    electron: ElectronAPI;
-    api: unknown;
+    commonToolkit: CommonToolkit;
   }
 }

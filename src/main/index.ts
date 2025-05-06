@@ -1,7 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron';
+import { electronApp, is, optimizer } from '@electron-toolkit/utils';
+import { app, BrowserWindow, Menu, shell } from 'electron';
 import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
+import { CommonToolkitRegistrar } from '../ipc/common';
 
 function createWindow(): void {
   // Create the browser window.
@@ -56,8 +57,8 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'));
+  // 注册通用工具
+  CommonToolkitRegistrar.registerIpcMain();
 
   createWindow();
 

@@ -11,6 +11,17 @@ defineOptions({
 const dialogVisible = ref(true);
 
 const form = ref<WorkspaceItem>({});
+
+const selectTargetPathHandler = (): void => {
+  window.commonToolkit.file.selectDirectory().then(path => {
+    form.value.targetPath = path;
+  });
+};
+const selectSourcePathHandler = (): void => {
+  window.commonToolkit.file.selectDirectory().then(path => {
+    form.value.sourcePath = path;
+  });
+};
 </script>
 
 <template>
@@ -22,14 +33,14 @@ const form = ref<WorkspaceItem>({});
       <ElFormItem label="工作目录" prop="targetPath">
         <ElInput v-model="form.targetPath" placeholder="请选择工作空间目录" readonly>
           <template #append>
-            <ElButton>选择</ElButton>
+            <ElButton @click="selectTargetPathHandler">选择</ElButton>
           </template>
         </ElInput>
       </ElFormItem>
       <ElFormItem label="安装源目录" prop="sourcePath">
         <ElInput v-model="form.sourcePath" placeholder="请选择安装源目录" readonly>
           <template #append>
-            <ElButton>选择</ElButton>
+            <ElButton @click="selectSourcePathHandler">选择</ElButton>
           </template>
         </ElInput>
       </ElFormItem>
