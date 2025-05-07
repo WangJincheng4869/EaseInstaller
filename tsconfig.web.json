@@ -5,7 +5,9 @@
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.vue",
     "src/preload/*.d.ts",
+    "src/typings/**/*",
   ],
+  "exclude": ["node_modules/@types/lodash"],
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElButton, ElDialog, ElForm, ElFormItem, ElInput } from 'element-plus';
-import { ref } from 'vue';
-import { WorkspaceItem } from './types';
+import { WorkspaceItem } from 'src/typings/workspace-types';
+import { ref, toRaw } from 'vue';
 
 // 工作空间表单对话框
 defineOptions({
@@ -20,6 +20,13 @@ const selectTargetPathHandler = (): void => {
 const selectSourcePathHandler = (): void => {
   window.commonToolkit.file.selectDirectory().then(path => {
     form.value.sourcePath = path;
+  });
+};
+
+const submitHandler = (): void => {
+  window.commonToolkit.data.storage.workspace.insert(toRaw(form.value)).then(id => {
+    console.log(id);
+    dialogVisible.value = false;
   });
 };
 </script>
@@ -47,7 +54,7 @@ const selectSourcePathHandler = (): void => {
     </ElForm>
     <template #footer>
       <ElButton @click="dialogVisible = false">取消</ElButton>
-      <ElButton type="primary" @click="dialogVisible = false">确定</ElButton>
+      <ElButton type="primary" @click="submitHandler">确定</ElButton>
     </template>
   </ElDialog>
 </template>

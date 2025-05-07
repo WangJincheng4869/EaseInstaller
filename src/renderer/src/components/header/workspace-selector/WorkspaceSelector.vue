@@ -11,8 +11,8 @@ import {
   ElLink,
   ElText
 } from 'element-plus';
-import { WorkspaceItem } from './types';
 import WorkspaceFormDialog from './WorkspaceFormDialog.vue';
+import { WorkspaceItem } from 'src/typings/workspace-types';
 
 // 工作空间选择器
 defineOptions({

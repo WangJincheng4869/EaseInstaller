@@ -1,8 +1,8 @@
-import { CommonToolkitRegistrar } from '../ipc/common';
+import { CommonToolkitIpcRendererRegistrar } from '../ipc/common';
 
 try {
   // 注册通用工具
-  CommonToolkitRegistrar.registerIpcRenderer();
+  CommonToolkitIpcRendererRegistrar.register();
 } catch (error) {
   console.error(error);
 }

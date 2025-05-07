@@ -2,7 +2,7 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import { app, BrowserWindow, Menu, shell } from 'electron';
 import { join } from 'path';
 import icon from '../../resources/icon.png?asset';
-import { CommonToolkitRegistrar } from '../ipc/common';
+import { CommonToolkitIpcMainRegistrar } from '../ipc/common';
 
 function createWindow(): void {
   // Create the browser window.
@@ -58,7 +58,7 @@ app.whenReady().then(() => {
   });
 
   // 注册通用工具
-  CommonToolkitRegistrar.registerIpcMain();
+  CommonToolkitIpcMainRegistrar.register();
 
   createWindow();
 
