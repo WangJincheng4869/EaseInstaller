@@ -1,2 +1,2 @@
-/** 工作空间存储 */
-export const WORKSPACE_ITEMS = 'workspace-items';
+/** 当前激活的工作空间 */
+export const ACTIVATED_WORKSPACE_KEY = 'activatedWorkspace';

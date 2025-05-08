@@ -1,10 +1,6 @@
 import { contextBridge } from 'electron';
 import { CommonToolkit } from './types';
 import {
-  WorkspaceDatasourceIpcMainRegistrar,
-  WorkspaceDatasourceIpcRendererRegistrar
-} from '../data/storage/workspace';
-import {
   SelectDirectoryIpcMainRegistrar,
   SelectDirectoryIpcRendererRegistrar
 } from './file/select-directory';
@@ -18,7 +14,6 @@ export class CommonToolkitIpcMainRegistrar {
    */
   static register(): void {
     SelectDirectoryIpcMainRegistrar.register();
-    WorkspaceDatasourceIpcMainRegistrar.register();
   }
 }
 
@@ -33,14 +28,6 @@ export class CommonToolkitIpcRendererRegistrar {
     const commonToolkit: CommonToolkit = {
       file: {
         selectDirectory: SelectDirectoryIpcRendererRegistrar.register
-      },
-      // TODO 这里应该从通用中拆出数据工具
-      data: {
-        storage: {
-          workspace: {
-            insert: WorkspaceDatasourceIpcRendererRegistrar.registerInsert
-          }
-        }
       }
     };
 

@@ -3,6 +3,7 @@ import { app, BrowserWindow, Menu, shell } from 'electron';
 import { join } from 'path';
 import icon from '../../resources/icon.png?asset';
 import { CommonToolkitIpcMainRegistrar } from '../ipc/common';
+import { StorageToolkitIpcMainRegistrar } from '../ipc/storage';
 
 function createWindow(): void {
   // Create the browser window.
@@ -13,7 +14,7 @@ function createWindow(): void {
     minHeight: 670,
     show: false,
     autoHideMenuBar: true,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -59,6 +60,8 @@ app.whenReady().then(() => {
 
   // 注册通用工具
   CommonToolkitIpcMainRegistrar.register();
+  // 注册存储工具
+  StorageToolkitIpcMainRegistrar.register();
 
   createWindow();
 

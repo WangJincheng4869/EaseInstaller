@@ -1,4 +1,4 @@
-import { WorkspaceItem } from '../../../../typings/workspace-types';
+import { WorkspaceItem } from '../../../typings/workspace-types';
 
 /** 工作空间数据源结构 */
 export interface WorkspaceDatasource {
@@ -8,9 +8,12 @@ export interface WorkspaceDatasource {
   workspaces: WorkspaceItem[];
 }
 
-export interface CommonDataStorageWorkspaceToolkit {
-  /** 读取工作空间数据 */
-  query?: () => Promise<WorkspaceDatasource>;
+export interface StorageWorkspaceToolkit {
+  /**
+   * 读取工作空间数据
+   * @returns 工作空间数据列表
+   */
+  query: () => Promise<WorkspaceItem[]>;
   /**
    * 插入工作空间数据
    * @param workspace 工作空间数据
