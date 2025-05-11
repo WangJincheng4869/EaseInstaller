@@ -42,7 +42,7 @@ export const install = async (
     await uninstall(_event, workspace, folder);
   }
 
-  await copy(sourcePath, workspace.targetPath);
+  await copy(sourcePath, workspace.targetPath, { overwrite: true });
 
   await createFile(path.join(sourcePath, INSTALLED_FILE_NAME));
 };
