@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue';
-import { ACTIVATED_WORKSPACE_KEY } from '@renderer/constant/local-storage-key-consts';
-import { useStorage } from '@vueuse/core';
-import { ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElIcon } from 'element-plus';
-import { isEmpty, isEqual } from 'lodash-es';
+import { useWorkspace } from '@renderer/store/workspace';
+import { useWindowSize } from '@vueuse/core';
+import {
+  ElButton,
+  ElDropdown,
+  ElDropdownItem,
+  ElDropdownMenu,
+  ElIcon,
+  ElMessage,
+  ElMessageBox
+} from 'element-plus';
+import { isEmpty, isNil } from 'lodash-es';
+import { storeToRefs } from 'pinia';
 import { WorkspaceItem } from 'src/typings/workspace-types';
 import { ref } from 'vue';
 import { WorkspaceFormDialogInstance } from './form-dialog/types';
@@ -16,31 +25,34 @@ defineOptions({
 });
 
 const workspaceFormDialogRef = ref<WorkspaceFormDialogInstance>();
-const workspaces = ref<WorkspaceItem[]>([]);
-
-// 当活动的工作空间
-const activatedWorkspace = useStorage<WorkspaceItem>(ACTIVATED_WORKSPACE_KEY, {});
+const workspaceStore = useWorkspace();
+const { activatedWorkspaceId, workspaces, activatedWorkspace } = storeToRefs(workspaceStore);
 
 /** 查询工作空间数据 */
 const queryWorkspaces = (): void => {
   window.storageToolkit.workspace.query().then(result => {
-    console.log('result', result);
     // 没有任何结果需要重置激活的工作空间
     if (isEmpty(result)) {
-      activatedWorkspace.value = {};
+      activatedWorkspaceId.value = null;
     } else {
       // 如果当前没有默认选中的工作空间，责默认选择第一个工作空间
-      if (isEmpty(activatedWorkspace.value)) {
-        activatedWorkspace.value = result[0];
+      if (isNil(activatedWorkspaceId.value)) {
+        selectHandler(result[0]);
       }
 
       // 判断当前工作空闲的有效性
-      if (result.findLastIndex(item => isEqual(item, activatedWorkspace.value)) === -1) {
-        activatedWorkspace.value = {};
+      if (
+        result.findLastIndex(
+          item =>
+            !isNil(item.id) &&
+            !isNil(activatedWorkspaceId.value) &&
+            item.id === activatedWorkspaceId.value
+        ) === -1
+      ) {
+        activatedWorkspaceId.value = null;
       }
 
-      // 移除当前激活的工作空间
-      workspaces.value = result.filter(item => item.id !== activatedWorkspace.value.id);
+      workspaces.value = result;
 
       console.log('workspaces', workspaces.value);
     }
@@ -49,10 +61,40 @@ const queryWorkspaces = (): void => {
 
 // 默认执行查询
 queryWorkspaces();
+
+/** 编辑工作空间 */
+const editHandler = (workspace: WorkspaceItem): void => {
+  workspaceFormDialogRef.value?.open(workspace);
+};
+
+/** 删除工作空间 */
+const deleteHandler = (workspace: WorkspaceItem): void => {
+  if (isNil(workspace.id)) {
+    return;
+  }
+  ElMessageBox.confirm(`确定要删除「${workspace.name}」吗？`, {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    window.storageToolkit.workspace.delete(workspace.id!).then(() => {
+      ElMessage.success('删除成功');
+      queryWorkspaces();
+    });
+  });
+};
+
+/** 选择工作空间 */
+const selectHandler = (workspace: WorkspaceItem): void => {
+  activatedWorkspaceId.value = workspace.id!;
+  workspaceStore.loadFolders();
+};
+
+const { height } = useWindowSize();
 </script>
 
 <template>
-  <ElDropdown trigger="click">
+  <ElDropdown trigger="click" :max-height="height - 100">
     <ElButton :text="true" size="small">
       {{ activatedWorkspace?.name ?? '请选择工作空间' }}
       <ElIcon class="ml-1">
@@ -65,14 +107,27 @@ queryWorkspaces();
         <template v-if="!isEmpty(activatedWorkspace)">
           <ElDropdownItem :disabled="true" divided>打开的空间</ElDropdownItem>
           <ElDropdownItem>
-            <WorkspaceSelectorItem :workspace="activatedWorkspace" />
+            <WorkspaceSelectorItem
+              :workspace="activatedWorkspace"
+              @edit="editHandler(activatedWorkspace)"
+              @delete="deleteHandler(activatedWorkspace)"
+            />
           </ElDropdownItem>
         </template>
         <template v-if="!isEmpty(workspaces)">
           <ElDropdownItem :disabled="true" divided>全部工作空间</ElDropdownItem>
-          <ElDropdownItem v-for="workspace in workspaces" :key="workspace.id">
-            <WorkspaceSelectorItem :workspace />
-          </ElDropdownItem>
+          <template v-for="workspace in workspaces" :key="workspace.id">
+            <ElDropdownItem
+              v-if="workspace.id !== activatedWorkspace.id"
+              @click="selectHandler(workspace)"
+            >
+              <WorkspaceSelectorItem
+                :workspace
+                @edit="editHandler(workspace)"
+                @delete="deleteHandler(workspace)"
+              />
+            </ElDropdownItem>
+          </template>
         </template>
       </ElDropdownMenu>
     </template>

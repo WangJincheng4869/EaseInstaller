@@ -21,7 +21,7 @@ export interface StorageWorkspaceToolkit {
    */
   insert: (workspace: WorkspaceItem) => Promise<number>;
   /** 更新工作空间数据 */
-  update?: (workspace: WorkspaceItem) => Promise<void>;
+  update: (workspace: WorkspaceItem) => Promise<void>;
   /** 删除工作空间数据 */
-  delete?: (id: number) => Promise<void>;
+  delete: (id: number) => Promise<void>;
 }

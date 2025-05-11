@@ -4,6 +4,7 @@ import { join } from 'path';
 import icon from '../../resources/icon.png?asset';
 import { CommonToolkitIpcMainRegistrar } from '../ipc/common';
 import { StorageToolkitIpcMainRegistrar } from '../ipc/storage';
+import { SourceToolkitIpcMainRegistrar } from '../ipc/source';
 
 function createWindow(): void {
   // Create the browser window.
@@ -57,11 +58,12 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
-
   // 注册通用工具
   CommonToolkitIpcMainRegistrar.register();
   // 注册存储工具
   StorageToolkitIpcMainRegistrar.register();
+  // 注册资源管理工具
+  SourceToolkitIpcMainRegistrar.register();
 
   createWindow();
 

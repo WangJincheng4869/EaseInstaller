@@ -9,3 +9,10 @@ export interface WorkspaceItem {
   /** 目标目录，会蒋源目录中的文件拷贝到这个目录下，或者根据源目录的文件删除这个目录中的内容 */
   targetPath?: string;
 }
+
+export interface SourceFolder {
+  /** 文件夹名称 */
+  name: string;
+  /** 当前是否安装 */
+  installed: boolean;
+}

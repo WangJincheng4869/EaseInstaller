@@ -8,7 +8,6 @@
     "src/ipc/**/*",
     "src/util/**/*"
   ],
-  "exclude": ["node_modules/@types/lodash"],
   "compilerOptions": {
     "composite": true,
     "types": ["electron-vite/node"]

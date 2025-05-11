@@ -11,16 +11,21 @@ defineOptions({
 defineProps<{
   workspace: WorkspaceItem;
 }>();
+
+defineEmits<{
+  edit: [workspace: WorkspaceItem];
+  delete: [workspace: WorkspaceItem];
+}>();
 </script>
 
 <template>
   <div>
     <div class="flex items-center">
       <span>{{ workspace.name }}</span>
-      <ElLink type="success" underline="never" class="ml-1">
+      <ElLink type="success" underline="never" class="ml-1" @click="$emit('edit', workspace)">
         <ElIcon><Edit /></ElIcon>
       </ElLink>
-      <ElLink type="danger" underline="never">
+      <ElLink type="danger" underline="never" @click="$emit('delete', workspace)">
         <ElIcon><Delete /></ElIcon>
       </ElLink>
     </div>

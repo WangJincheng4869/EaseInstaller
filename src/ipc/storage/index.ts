@@ -28,7 +28,9 @@ export class StorageToolkitIpcRendererRegistrar {
     const storageToolkit: StorageToolkit = {
       workspace: {
         insert: WorkspaceDatasourceIpcRendererRegistrar.registerInsert,
-        query: WorkspaceDatasourceIpcRendererRegistrar.registerQuery
+        query: WorkspaceDatasourceIpcRendererRegistrar.registerQuery,
+        update: WorkspaceDatasourceIpcRendererRegistrar.registerUpdate,
+        delete: WorkspaceDatasourceIpcRendererRegistrar.registerDelete
       }
     };
 
