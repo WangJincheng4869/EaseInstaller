@@ -32,8 +32,6 @@ export const load = async (
         name: folder.name,
         installed: existsSync(path.join(folder.parentPath, folder.name, INSTALLED_FILE_NAME))
       });
-
-      console.log(path.join(folder.parentPath, INSTALLED_FILE_NAME), result);
     });
 
   return result;
