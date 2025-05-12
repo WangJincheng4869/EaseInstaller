@@ -21,16 +21,20 @@ export class CommonToolkitIpcMainRegistrar {
  * 通用工具 渲染线程 IPC 注册机
  */
 export class CommonToolkitIpcRendererRegistrar {
+  private static registered = false;
   /**
    * 渲染器 IPC 注册
    */
   static register(): void {
+    if (this.registered) {
+      return;
+    }
     const commonToolkit: CommonToolkit = {
       file: {
         selectDirectory: SelectDirectoryIpcRendererRegistrar.register
       }
     };
-
     contextBridge.exposeInMainWorld('commonToolkit', commonToolkit);
+    this.registered = true;
   }
 }

@@ -1,8 +1,8 @@
 import { contextBridge, ipcMain, ipcRenderer } from 'electron';
 import { WorkspaceItem } from '../../typings/workspace-types';
-import { load, IPC_CHANNEL_SOURCE_LOAD } from './load-folders';
-import { SourceToolkit } from './types';
 import { install, IPC_CHANNEL_SOURCE_INSTALL } from './install';
+import { IPC_CHANNEL_SOURCE_LOAD, load } from './load-folders';
+import { SourceToolkit } from './types';
 import { IPC_CHANNEL_SOURCE_UNINSTALL, uninstall } from './uninstall';
 
 /**
@@ -23,10 +23,14 @@ export class SourceToolkitIpcMainRegistrar {
  * 安装源管理工具，用于读取，安装、卸载等操作。 渲染线程 IPC 注册机
  */
 export class SourceToolkitIpcRendererRegistrar {
+  private static registered = false;
   /**
    * 渲染器 IPC 注册
    */
   static register(): void {
+    if (this.registered) {
+      return;
+    }
     const sourceToolkit: SourceToolkit = {
       load: (workspace: WorkspaceItem) => {
         return ipcRenderer.invoke(IPC_CHANNEL_SOURCE_LOAD, workspace);
@@ -40,5 +44,7 @@ export class SourceToolkitIpcRendererRegistrar {
     };
 
     contextBridge.exposeInMainWorld('sourceToolkit', sourceToolkit);
+
+    this.registered = true;
   }
 }

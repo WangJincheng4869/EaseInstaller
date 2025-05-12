@@ -21,10 +21,15 @@ export class StorageToolkitIpcMainRegistrar {
  * 通用工具 渲染线程 IPC 注册机
  */
 export class StorageToolkitIpcRendererRegistrar {
+  private static registered = false;
   /**
    * 渲染器 IPC 注册
    */
   static register(): void {
+    if (this.registered) {
+      return;
+    }
+    this.registered = true;
     const storageToolkit: StorageToolkit = {
       workspace: {
         insert: WorkspaceDatasourceIpcRendererRegistrar.registerInsert,
@@ -35,5 +40,7 @@ export class StorageToolkitIpcRendererRegistrar {
     };
 
     contextBridge.exposeInMainWorld('storageToolkit', storageToolkit);
+
+    this.registered = true;
   }
 }

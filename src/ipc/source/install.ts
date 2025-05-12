@@ -38,7 +38,6 @@ export const install = async (
   }
 
   if (uninstallFolder) {
-    // todo 卸载存在 bug 需要修复，无法正确删除文件
     await uninstall(_event, workspace, folder);
   }
 

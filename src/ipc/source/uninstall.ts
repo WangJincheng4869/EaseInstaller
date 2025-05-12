@@ -1,13 +1,20 @@
 import { IpcMainInvokeEvent } from 'electron';
-import { existsSync, readdirSync, rmdirSync, rmSync, statSync } from 'fs-extra';
+import { existsSync, readdirSync, rmdirSync, rmSync } from 'fs-extra';
 import path from 'path';
 import { WorkspaceItem } from '../../typings/workspace-types';
 import { INSTALLED_FILE_NAME } from './consts';
 
 /** 安装资源 IPC 事件名称 */
 export const IPC_CHANNEL_SOURCE_UNINSTALL = 'source:uninstall';
+/** 卸载进度 */
+export const IPC_CHANNEL_SOURCE_UNINSTALL_PROGRESS = 'source:uninstall:progress';
 
-// todo 卸载存在 bug 需要修复，无法正确删除文件
+/**
+ * 卸载资源
+ * @param _event IPC 事件
+ * @param workspace 当前工作空间
+ * @param folder 要卸载的文件夹名称
+ */
 export const uninstall = async (
   _event: IpcMainInvokeEvent,
   workspace: WorkspaceItem,
@@ -30,25 +37,33 @@ export const uninstall = async (
     throw new Error(`目标目录不存在：${workspace.targetPath}`);
   }
 
+  // 防止 targetPath 是 sourcePath 的父目录
+  const normalizedSource = path.resolve(sourcePath);
+  const normalizedTarget = path.resolve(workspace.targetPath);
+  if (normalizedTarget.startsWith(normalizedSource)) {
+    throw new Error('目标目录不能是源目录的子目录');
+  }
+
   // 新增逻辑：遍历 sourcePath 并删除与 targetPath 中同名的文件
-  const sourceFiles = walkSync(sourcePath);
-  for (const sourceFilePath of sourceFiles) {
+  const { files, paths } = walkSync(sourcePath);
+
+  for (const sourceFilePath of files) {
     const relativePath = path.relative(sourcePath, sourceFilePath);
     const targetFilePath = path.join(workspace.targetPath, relativePath);
     if (existsSync(targetFilePath)) {
-      // 删除 sourcePath 中的文件
+      // 删除 targetFilePath 中的文件
       rmSync(targetFilePath);
-      // 清理空目录
-      let currentDir = path.dirname(targetFilePath);
-      while (true) {
-        try {
-          rmdirSync(currentDir);
-          currentDir = path.dirname(currentDir);
-          if (currentDir === sourcePath) break; // 停止在 sourcePath 根目录
-        } catch {
-          break;
-        }
-      }
+    }
+  }
+
+  // 清理空目录
+  for (const dir of paths) {
+    const relativePath = path.relative(sourcePath, dir);
+    const targetDir = path.join(workspace.targetPath, relativePath);
+    const files = readdirSync(targetDir);
+    // 如果目录中没有了内容，则删除当前目录
+    if (files.length === 0) {
+      rmdirSync(targetDir);
     }
   }
 
@@ -56,18 +71,29 @@ export const uninstall = async (
   rmSync(path.join(sourcePath, INSTALLED_FILE_NAME));
 };
 
-// 同步递归遍历目录，返回所有文件路径
-function walkSync(dir: string): string[] {
-  let results: string[] = [];
-  const list = readdirSync(dir);
+/**
+ * 同步递归遍历目录，返回所有文件路径
+ * @param dir 目录
+ * @returns 当前目录中的全部文件的完整路径
+ */
+function walkSync(dir: string): { files: string[]; paths: string[] } {
+  let files: string[] = [];
+  let paths: string[] = [];
+  const list = readdirSync(dir, { withFileTypes: true });
   for (const file of list) {
-    const fullPath = path.join(dir, file);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      results = results.concat(walkSync(fullPath));
+    const fullPath = path.join(dir, file.name);
+    if (file.isDirectory()) {
+      // 如果是文件夹则保存起来
+      paths.push(fullPath);
+      const temp = walkSync(fullPath);
+      files = files.concat(temp.files);
+      paths = paths.concat(temp.paths);
     } else {
-      results.push(fullPath);
+      files.push(fullPath);
     }
   }
-  return results;
+
+  // 层级最深的在前
+  paths = paths.sort((a, b) => b.split('\\').length - a.split('\\').length);
+  return { files, paths };
 }
