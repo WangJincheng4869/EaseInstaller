@@ -6,7 +6,8 @@
     "src/preload/**/*",
     "src/typings/**/*",
     "src/ipc/**/*",
-    "src/util/**/*"
+    "src/util/**/*",
+    "src/cache/**/*"
   ],
   "compilerOptions": {
     "composite": true,
