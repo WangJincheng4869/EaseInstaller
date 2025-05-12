@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ElButton, ElText } from 'element-plus';
 import Folder from '@renderer/assets/folder.svg';
-import { SourceFolder } from 'src/typings/workspace-types';
 import { useWorkspace } from '@renderer/store/workspace';
+import { ElButton, ElMessage, ElText } from 'element-plus';
 import { storeToRefs } from 'pinia';
-import { ref, toRaw } from 'vue';
+import { SourceFolder } from 'src/typings/workspace-types';
+import { computed, ref, toRaw } from 'vue';
 
 // 文件夹列表项
 defineOptions({
@@ -15,21 +15,49 @@ const { item } = defineProps<{
   item: SourceFolder;
 }>();
 const workspaceStore = useWorkspace();
-const { activatedWorkspace } = storeToRefs(workspaceStore);
+const { activatedWorkspace, loading } = storeToRefs(workspaceStore);
 
-const installing = ref(false);
+// 当前正则安装的文件夹名
+const name = ref();
+
+const isCurrent = computed(() => {
+  return item.name === name.value;
+});
 const installHandler = (): void => {
-  installing.value = true;
-  window.sourceToolkit.install(toRaw(activatedWorkspace.value), toRaw(item.name)).then(() => {
-    workspaceStore.loadFolders();
-    installing.value = false;
-  });
+  loading.value = true;
+  name.value = item.name;
+  window.sourceToolkit
+    .install(toRaw(activatedWorkspace.value), toRaw(item.name))
+    .then(() => {
+      workspaceStore.loadFolders();
+    })
+    .catch(err => {
+      console.error(err);
+      ElMessage.error('安装失败');
+    })
+    .finally(() => {
+      loading.value = false;
+      name.value = '';
+    });
 };
 
+// 当前正则卸载的文件夹名
 const uninstallHandler = (): void => {
-  window.sourceToolkit.uninstall(toRaw(activatedWorkspace.value), toRaw(item.name)).then(() => {
-    workspaceStore.loadFolders();
-  });
+  name.value = item.name;
+  loading.value = true;
+  window.sourceToolkit
+    .uninstall(toRaw(activatedWorkspace.value), toRaw(item.name))
+    .then(() => {
+      workspaceStore.loadFolders();
+    })
+    .catch(err => {
+      console.error(err);
+      ElMessage.error('卸载失败');
+    })
+    .finally(() => {
+      loading.value = false;
+      name.value = '';
+    });
 };
 </script>
 
@@ -47,6 +75,8 @@ const uninstallHandler = (): void => {
         class="ml-3"
         plain
         round
+        :disabled="loading && !isCurrent"
+        :loading="loading && isCurrent"
         @click="uninstallHandler"
       >
         卸载
@@ -58,7 +88,8 @@ const uninstallHandler = (): void => {
         class="ml-3"
         plain
         round
-        :loading="installing"
+        :disabled="loading && !isCurrent"
+        :loading="loading && isCurrent"
         @click="installHandler"
         >安装</ElButton
       >

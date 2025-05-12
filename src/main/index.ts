@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset';
 import { CommonToolkitIpcMainRegistrar } from '../ipc/common';
 import { StorageToolkitIpcMainRegistrar } from '../ipc/storage';
 import { SourceToolkitIpcMainRegistrar } from '../ipc/source';
+import { WindowCache } from '../cache/window';
 
 function createWindow(): void {
   // Create the browser window.
@@ -43,6 +44,9 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
   }
+
+  // 缓存主窗口
+  WindowCache.setMainWindow(mainWindow);
 }
 
 // This method will be called when Electron has finished

@@ -46,6 +46,9 @@ export const useWorkspace = defineStore(ACTIVATED_WORKSPACE_ID_KEY, () => {
     });
   };
 
+  // 当前工作空间是否正在加载中
+  const loading = ref(false);
+
   return {
     /** 工作空间列表 */
     workspaces,
@@ -58,6 +61,8 @@ export const useWorkspace = defineStore(ACTIVATED_WORKSPACE_ID_KEY, () => {
     /** 检索文件夹搜索关键字 */
     searchFolderKey,
     /** 加载文件夹列表 */
-    loadFolders
+    loadFolders,
+    /** 是否在加载中 */
+    loading
   };
 });

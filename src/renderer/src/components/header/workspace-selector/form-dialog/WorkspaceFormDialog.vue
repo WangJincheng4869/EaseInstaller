@@ -24,6 +24,19 @@ const formRef = ref<FormInstance>();
 // 当前是否为修改操作
 const isEdit = ref(false);
 
+/**
+ * 判断 path1 是否是 path2 的子目录
+ */
+function isSubdirectory(path1?: string, path2?: string): boolean {
+  if (!path1 || !path2) return false;
+  const normalizedPath1 = path1.toLowerCase();
+  const normalizedPath2 = path2.toLowerCase();
+  return (
+    normalizedPath1.startsWith(normalizedPath2 + '\\') ||
+    normalizedPath1.startsWith(normalizedPath2 + '/')
+  );
+}
+
 const formRules: FormRules<WorkspaceItem> = {
   name: [
     { required: true, message: '请输入工作空间名称', trigger: 'change' },
@@ -35,6 +48,8 @@ const formRules: FormRules<WorkspaceItem> = {
       validator: (_rule, value, callback) => {
         if (value === form.value.sourcePath) {
           callback(new Error('工作目录不能与源目录相同'));
+        } else if (isSubdirectory(form.value.sourcePath, value)) {
+          callback(new Error('源目录不能是工作目录的子目录'));
         } else {
           // 源目录存在时，校验目标目录是否为源目录的子目录
           if (form.value.sourcePath) {
@@ -52,6 +67,8 @@ const formRules: FormRules<WorkspaceItem> = {
       validator: (_rule, value, callback) => {
         if (value === form.value.targetPath) {
           callback(new Error('工作目录不能与源目录相同'));
+        } else if (isSubdirectory(form.value.targetPath, value)) {
+          callback(new Error('工作目录不能是源目录的子目录'));
         } else {
           // 如果目标目录已经填写，则需要校验目标目录是否是源目录的子目录
           if (form.value.targetPath) {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ElScrollbar } from 'element-plus';
-import FolderListItem from './FolderListItem.vue';
 import { useWorkspace } from '@renderer/store/workspace';
+import { ElScrollbar } from 'element-plus';
 import { storeToRefs } from 'pinia';
+import FolderListItem from './FolderListItem.vue';
 
 // 文件夹列表
 defineOptions({
